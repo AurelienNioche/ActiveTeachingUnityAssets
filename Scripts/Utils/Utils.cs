@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace AssemblyCSharp
 {
@@ -18,6 +19,15 @@ namespace AssemblyCSharp
                 list[k] = list[n];
                 list[n] = value;
             }
+        }
+    }
+
+    public static class TimeStamp
+    {
+        public static string Get()
+        {
+            return DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.ffffff",
+                                                CultureInfo.InvariantCulture);
         }
     }
 }

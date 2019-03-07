@@ -90,10 +90,9 @@ using AssemblyCSharp;
         }
     }
 
-    public void AskNewQuestion()
+    public void AskNewQuestion(Reply reply)
     {
-        Reply req = new Reply();
-        string toSend = JsonUtility.ToJson(req);
+        string toSend = JsonUtility.ToJson(reply);
         w.Send(toSend);
     }
 }

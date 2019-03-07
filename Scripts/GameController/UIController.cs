@@ -1,9 +1,9 @@
 ﻿using System.Collections;
-using System.Globalization;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using AssemblyCSharp;
 
 class Bool {
 	public static string visible = "Visible";
@@ -21,27 +21,23 @@ public class UIController : MonoBehaviour {
     public Color colorDisabled = new Color(0.3f, 0.4f, 0.6f, 0.3f);
 
     public Button startButton;
-    public List<Button> reply;
-    public Text question;
+    public List<Button> replyButton;
+    public Text questionText;
 
-    // Bottom: status bar
-    // public Slider statusProgressBar;
-    // public Text statusText;
+    public GameObject endScreen;
+    public GameObject homeScreen;
 
-    // Top left: radial progress bar
-    // public Image radialProgressBar;
-    // public Text pseudo;
+    public GameObject progressionTool;
+
+    public Image progressionBar;
 
     List<Text> replyText;
-
-   // string replyUserStr;
 
     int correctAnswerIdx;
 
     bool userReplied;
 
-    string timeDisplay;
-    string timeReply;
+    Reply reply;
 
     GameController gameController;
 
@@ -52,18 +48,23 @@ public class UIController : MonoBehaviour {
         // uiProgressBars = GetComponent<UIProgressBars> ();
         gameController = GetComponent<GameController>();
         replyText = new List<Text>();
-        startButton.onClick.AddListener(StartButton);
+        startButton.onClick.AddListener(UserStart);
 
-        for (int i = 0; i < reply.Count; i++)
+        for (int i = 0; i < replyButton.Count; i++)
         {
             int v = i;
-            reply[i].onClick.AddListener(delegate { Reply(v); });
-            reply[i].interactable = false;
-            replyText.Add(GetText(reply[i]));
+            replyButton[i].onClick.AddListener(delegate { Reply(v); });
+            replyButton[i].interactable = false;
+            replyText.Add(GetText(replyButton[i]));
         }
+
+        reply = new Reply();
     }
 
-	void Start () {}
+	void Start () {
+        Anim(homeScreen);
+        Anim(startButton);
+    }
 
 	void Update () {}
 
@@ -94,14 +95,15 @@ public class UIController : MonoBehaviour {
     // ---------------------------------- //
 
 
-    void StartButton()
+    void UserStart()
     {
         Debug.Log("[UIController] User clicked on starting button.");
 
         startButton.interactable = false;
         Anim(startButton, visible: false);
+        Anim(homeScreen, visible: false);
 
-        gameController.UserReplied();
+        gameController.UserReplied(reply);
     }
 
     void Reply(int idx)
@@ -109,24 +111,25 @@ public class UIController : MonoBehaviour {
         if (!userReplied)
         {
             // Get the time of reply
-            timeReply = GetTime();
+            reply.timeReply = TimeStamp.Get();
+            reply.reply = replyText[idx].text;
 
             // Disable the buttons
-            for (int i = 0; i < reply.Count; i++)
+            for (int i = 0; i < replyButton.Count; i++)
             {
-                reply[i].interactable = false;
-                reply[i].image.color = colorDisabled;
+                replyButton[i].interactable = false;
+                replyButton[i].image.color = colorDisabled;
             }
 
             // Put in green the correct answer
-            reply[correctAnswerIdx].image.color = colorCorrect;
+            replyButton[correctAnswerIdx].image.color = colorCorrect;
 
             // Put in red the wrong answer if applicable
             if (idx != correctAnswerIdx)
             {
-                reply[idx].image.color = colorIncorrect;
-                reply[correctAnswerIdx].interactable = true;
-                Anim(reply[correctAnswerIdx], glow: true);
+                replyButton[idx].image.color = colorIncorrect;
+                replyButton[correctAnswerIdx].interactable = true;
+                Anim(replyButton[correctAnswerIdx], glow: true);
                 userReplied = true;
             }
             else
@@ -137,14 +140,14 @@ public class UIController : MonoBehaviour {
         }
         else
         {
-            reply[idx].interactable = false;
+            replyButton[idx].interactable = false;
             UserReplied();
         }
     }
 
     void UserReplied()
     {
-        gameController.UserReplied();
+        gameController.UserReplied(reply);
     }
 
     // ----------------------------------- //
@@ -156,33 +159,50 @@ public class UIController : MonoBehaviour {
 
     // -------------------------------- //
 
-    public void SetQuestion(string questionStr, int correctAnswerIdx, 
-        List<string> answerTextStr)
+    public void SetQuestion(Question question)
     {
-        userReplied = false;
-        this.correctAnswerIdx = correctAnswerIdx;
-
-        question.text = questionStr;
-
-        Anim(question);
-
-        for (int i = 0; i < reply.Count; i++)
+        if (question.t != -1)
         {
-            replyText[i].text = answerTextStr[i];
-            reply[i].image.color = colorNeutral; 
-            reply[i].interactable = true;
-            Anim(reply[i], glow: false);
+            userReplied = false;
+            correctAnswerIdx = question.correctAnswerIdx;
+
+            // Update question
+            questionText.text = question.question;
+            Anim(questionText);
+
+
+            // Update progression bar
+            Anim(progressionTool);
+            UpdateProgression(question.t, question.tMax);
+
+            // Update reply buttons
+            for (int i = 0; i < replyButton.Count; i++)
+            {
+                replyText[i].text = question.possibleReplies[i];
+                replyButton[i].image.color = colorNeutral;
+                replyButton[i].interactable = true;
+                Anim(replyButton[i], glow: false);
+            }
+
+            // Prepare sending of the reply to the server
+            reply.userId = question.userId;
+            reply.t = question.t;
+            reply.timeDisplay = TimeStamp.Get();
         }
 
-        timeDisplay = GetTime();
+        else
+        {
+            Anim(endScreen);
+        }
+
     }
 
-    static string GetTime()
+    // ------------ Progress bar ----------- //
+
+    public void UpdateProgression (int value, int maxValue) 
     {
-        return DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss.fff",
-                                            CultureInfo.InvariantCulture);
+      progressionBar.fillAmount = (float) value / maxValue;
     }
-
 }
 
 
