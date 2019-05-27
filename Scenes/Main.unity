@@ -54,7 +54,7 @@ LightmapSettings:
     m_EnableBakedLightmaps: 0
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
-    serializedVersion: 10
+    serializedVersion: 12
     m_Resolution: 2
     m_BakeResolution: 40
     m_AtlasSize: 1024
@@ -62,6 +62,7 @@ LightmapSettings:
     m_AOMaxDistance: 1
     m_CompAOExponent: 1
     m_CompAOExponentDirect: 0
+    m_ExtractAmbientOcclusion: 0
     m_Padding: 2
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
@@ -76,10 +77,16 @@ LightmapSettings:
     m_PVRDirectSampleCount: 32
     m_PVRSampleCount: 500
     m_PVRBounces: 2
+    m_PVREnvironmentSampleCount: 500
+    m_PVREnvironmentReferencePointCount: 2048
+    m_PVRFilteringMode: 2
+    m_PVRDenoiserTypeDirect: 0
+    m_PVRDenoiserTypeIndirect: 0
+    m_PVRDenoiserTypeAO: 0
     m_PVRFilterTypeDirect: 0
     m_PVRFilterTypeIndirect: 0
     m_PVRFilterTypeAO: 0
-    m_PVRFilteringMode: 1
+    m_PVREnvironmentMIS: 0
     m_PVRCulling: 1
     m_PVRFilteringGaussRadiusDirect: 1
     m_PVRFilteringGaussRadiusIndirect: 5
@@ -88,6 +95,7 @@ LightmapSettings:
     m_PVRFilteringAtrousPositionSigmaIndirect: 2
     m_PVRFilteringAtrousPositionSigmaAO: 1
     m_ShowResolutionOverlay: 1
+    m_ExportTrainingData: 0
   m_LightingDataAsset: {fileID: 0}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -227,6 +235,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 334159463360212056, guid: 23fe1b383f2cb4ea58455d95f3958144,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 23fe1b383f2cb4ea58455d95f3958144, type: 3}
 --- !u!1001 &2275374529582183798
@@ -363,6 +376,11 @@ PrefabInstance:
     - target: {fileID: 2608196045626889169, guid: 955a3de020240405ab5634ead7f6a90d,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2608196045626889183, guid: 955a3de020240405ab5634ead7f6a90d,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -552,7 +570,7 @@ PrefabInstance:
     - target: {fileID: 9049091682729019106, guid: 47737078798d345b8b2f99fb33d93b0f,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 102.90001
+      value: 102.8999
       objectReference: {fileID: 0}
     - target: {fileID: 9049091682729019106, guid: 47737078798d345b8b2f99fb33d93b0f,
         type: 3}
@@ -562,12 +580,12 @@ PrefabInstance:
     - target: {fileID: 6500924531709642404, guid: 47737078798d345b8b2f99fb33d93b0f,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 102.90001
+      value: 102.8999
       objectReference: {fileID: 0}
     - target: {fileID: 4575697581760077840, guid: 47737078798d345b8b2f99fb33d93b0f,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 102.90001
+      value: 102.8999
       objectReference: {fileID: 0}
     - target: {fileID: 4575697581760077840, guid: 47737078798d345b8b2f99fb33d93b0f,
         type: 3}
@@ -577,7 +595,7 @@ PrefabInstance:
     - target: {fileID: 4462890431052684539, guid: 47737078798d345b8b2f99fb33d93b0f,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -30.029999
+      value: -30.03003
       objectReference: {fileID: 0}
     - target: {fileID: 4462890431052684539, guid: 47737078798d345b8b2f99fb33d93b0f,
         type: 3}
@@ -587,12 +605,12 @@ PrefabInstance:
     - target: {fileID: 4081512453066603455, guid: 47737078798d345b8b2f99fb33d93b0f,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -30.029999
+      value: -30.03003
       objectReference: {fileID: 0}
     - target: {fileID: 8095339686894537756, guid: 47737078798d345b8b2f99fb33d93b0f,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -30.029999
+      value: -30.03003
       objectReference: {fileID: 0}
     - target: {fileID: 8095339686894537756, guid: 47737078798d345b8b2f99fb33d93b0f,
         type: 3}
