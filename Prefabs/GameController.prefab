@@ -76,6 +76,10 @@ MonoBehaviour:
   colorCorrect: {r: 0, g: 0.7019608, b: 0.10998162, a: 1}
   colorIncorrect: {r: 1, g: 0, b: 0.026828766, a: 1}
   colorDisabled: {r: 0.8113208, g: 0.8113208, b: 0.8113208, a: 1}
+  numberIterationsSlider: {fileID: 0}
+  numberIterationsLabel: {fileID: 0}
+  registerReplies: {fileID: 0}
+  LeitnerToggle: {fileID: 0}
   startButton: {fileID: 0}
   replyButton:
   - {fileID: 0}

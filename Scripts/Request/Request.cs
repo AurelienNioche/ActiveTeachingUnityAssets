@@ -11,12 +11,22 @@ namespace AssemblyCSharp
     [Serializable]
     public class Reply
     {
+        // User info
         public int userId = -1;
+        // Settings
+        public int nIteration = -1;
+        public bool registerReplies;
+        public string teacher = "<empty>";
+        // Question info
+        // Before
         public int t = -1;
-        public string reply = "<empty>";
+        public int idQuestion = -1;
+        public List<int> idPossibleReplies = new List<int>();
         public string timeDisplay = "<empty>";
+        // After
+        public int idReply = -1;
+        public bool success;
         public string timeReply = "<empty>";
-        // public string deviceId = "";
     }
 
     [Serializable]
@@ -24,11 +34,14 @@ namespace AssemblyCSharp
     {
         public int userId = -1;
         public int t = -1;
-        public int tMax = -1;
-        public int correctAnswerIdx = -1;
+        public int nIteration = -1;
         public string question = "<empty>";
-        public string correctAnswer = "<empty>";
         public List<string> possibleReplies = new List<string>();
+        public int idCorrectAnswer = -1;
+        public int idQuestion = -1;
+        public int idReply = -1;
+        public bool newQuestion;
+        public List<int> idPossibleReplies = new List<int>();
 
         public static Question CreateFromJson(string jsonString)
         {

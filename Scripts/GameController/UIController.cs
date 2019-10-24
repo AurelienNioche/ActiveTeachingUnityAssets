@@ -5,22 +5,45 @@ using UnityEngine;
 using UnityEngine.UI;
 using AssemblyCSharp;
 
-class Bool {
-	public static string visible = "Visible";
-	public static string glow = "Glow";
+class Bool
+{
+    public static string visible = "Visible";
+    public static string glow = "Glow";
+}
+
+class Teacher
+{
+    public static string leitner = "leitner";
+    public static string active = "active";
+}
+
+class Pref
+{
+    public static string nIterations = "nIterations";
+    public static string teacher = "teacher";
+    public static string registerReplies = "registerReplies";
 }
 
 
-public class UIController : MonoBehaviour {
+public class UIController : MonoBehaviour
+{
 
     public float timeDisplayingCorrect = 1.0f;
 
+    // Colors for replies
     public Color colorNeutral = new Color(0.3f, 0.4f, 0.6f, 0.3f);
     public Color colorCorrect = new Color(0.3f, 0.4f, 0.6f, 0.3f);
     public Color colorIncorrect = new Color(0.3f, 0.4f, 0.6f, 0.3f);
     public Color colorDisabled = new Color(0.3f, 0.4f, 0.6f, 0.3f);
 
+    // User settings
+    public Slider numberIterationsSlider;
+    public Text numberIterationsText;
+    public Toggle registerReplies;
+    public Toggle LeitnerToggle;
     public Button startButton;
+
+    // Task
     public List<Button> replyButton;
     public Text questionText;
 
@@ -31,19 +54,61 @@ public class UIController : MonoBehaviour {
 
     public Image progressionBar;
 
+    // -----------------------------------------------------------------------//
+
     List<Text> replyText;
 
-    int correctAnswerIdx;
+    int nIteration;
 
     bool userReplied;
 
+    string teacher;
+
+    Question qst;
     Reply reply;
 
     GameController gameController;
 
-    // -------------- Inherited from MonoBehavior ---------------------------- //
+    // -------------- Inherited from MonoBehavior --------------------------- //
 
-    void Awake () {
+    void Awake()
+    {
+        if (PlayerPrefs.HasKey(Pref.registerReplies))
+        {
+            UserChangeRegisterReplies(PlayerPrefs.GetInt(Pref.registerReplies) != 0);
+        } else
+        {
+            UserChangeRegisterReplies(true);
+        }
+
+        if (PlayerPrefs.HasKey(Pref.teacher))
+        {
+            UserSelectTeacher(PlayerPrefs.GetString(Pref.teacher));
+        } else
+        {
+            UserSelectTeacher(Teacher.leitner);
+        }
+
+        if (PlayerPrefs.HasKey(Pref.nIterations))
+        {
+            UserChangeNumberIterations(PlayerPrefs.GetInt(Pref.nIterations));
+        } else
+        {
+            UserChangeNumberIterations(1000);
+        }
+
+        // Settings
+        LeitnerToggle.onValueChanged.AddListener(delegate {
+            UserSelectTeacher(Teacher.leitner);
+        });
+        numberIterationsSlider.onValueChanged.AddListener(delegate {
+            UserChangeNumberIterations((int) numberIterationsSlider.value);
+        });
+        registerReplies.onValueChanged.AddListener(delegate
+        {
+            UserChangeRegisterReplies(registerReplies.isOn);
+        });
+        
 
         // uiProgressBars = GetComponent<UIProgressBars> ();
         gameController = GetComponent<GameController>();
@@ -61,38 +126,67 @@ public class UIController : MonoBehaviour {
         reply = new Reply();
     }
 
-	void Start () {
+    void Start()
+    {
         Anim(homeScreen);
         Anim(startButton);
     }
 
-	void Update () {}
+    void Update() { }
 
-	//// ----------------- //
+    //// ----------------- //
 
-	void Anim (GameObject go, bool visible=true, bool glow=false) {
-		Animator anim = go.GetComponent<Animator> ();
-		anim.SetBool (Bool.visible, visible);
-		anim.SetBool(Bool.glow, glow);
-	}
+    void Anim(GameObject go, bool visible = true, bool glow = false)
+    {
+        Animator anim = go.GetComponent<Animator>();
+        anim.SetBool(Bool.visible, visible);
+        anim.SetBool(Bool.glow, glow);
+    }
 
-	void Anim (Button btn, bool visible=true, bool glow=false) {
-		Anim (btn.gameObject, visible, glow);
-	}
+    void Anim(Button btn, bool visible = true, bool glow = false)
+    {
+        Anim(btn.gameObject, visible, glow);
+    }
 
-	void Anim (Slider slider, bool visible=true, bool glow=false) {
-		Anim (slider.gameObject, visible, glow);
-	}
+    void Anim(Slider slider, bool visible = true, bool glow = false)
+    {
+        Anim(slider.gameObject, visible, glow);
+    }
 
-	void Anim (Text text, bool visible=true, bool glow=false) {
-		Anim (text.gameObject, visible, glow);
-	}
+    void Anim(Text text, bool visible = true, bool glow = false)
+    {
+        Anim(text.gameObject, visible, glow);
+    }
 
-	void Anim (Image image, bool visible=true, bool glow=false) {
-		Anim (image.gameObject, visible, glow);
-	}
+    void Anim(Image image, bool visible = true, bool glow = false)
+    {
+        Anim(image.gameObject, visible, glow);
+    }
 
     // ---------------------------------- //
+
+    void UserSelectTeacher(string selectedTeacher)
+    {
+        LeitnerToggle.isOn |= selectedTeacher == Teacher.leitner;
+        teacher = selectedTeacher;
+        PlayerPrefs.SetString(Pref.teacher, selectedTeacher);
+    }
+
+    void UserChangeNumberIterations(int value)
+    {
+        numberIterationsSlider.value = value;
+        numberIterationsText.text = numberIterationsSlider.value.ToString();
+        nIteration = (int) numberIterationsSlider.value;
+        PlayerPrefs.SetInt(Pref.nIterations, value);
+    }
+
+    void UserChangeRegisterReplies(bool value)
+    {
+        registerReplies.isOn = value;
+        PlayerPrefs.SetInt(Pref.registerReplies, value ? 1 : 0);
+    }
+
+    // ----------------------------------- //
 
 
     void UserStart()
@@ -103,6 +197,14 @@ public class UIController : MonoBehaviour {
         Anim(startButton, visible: false);
         Anim(homeScreen, visible: false);
 
+        // Set time step
+        reply.timeReply = TimeStamp.Get();
+
+        // Get settings
+        reply.registerReplies = registerReplies.isOn;
+        reply.nIteration = nIteration;
+        reply.teacher = teacher;
+
         gameController.UserReplied(reply);
     }
 
@@ -110,9 +212,20 @@ public class UIController : MonoBehaviour {
     {
         if (!userReplied)
         {
-            // Get the time of reply
+            // Set the reply
             reply.timeReply = TimeStamp.Get();
-            reply.reply = replyText[idx].text;
+            reply.idReply = qst.idPossibleReplies[idx];
+            reply.success = qst.idCorrectAnswer == qst.idPossibleReplies[idx];
+
+            // Get idx of correct answer
+            int idxCorrectAnswer =
+                qst.idPossibleReplies.IndexOf(qst.idCorrectAnswer);
+
+            // Stop glowing effet for new question
+            if (qst.newQuestion)
+            {
+                Anim(replyButton[idxCorrectAnswer], glow: false);
+            }
 
             // Disable the buttons
             for (int i = 0; i < replyButton.Count; i++)
@@ -122,14 +235,14 @@ public class UIController : MonoBehaviour {
             }
 
             // Put in green the correct answer
-            replyButton[correctAnswerIdx].image.color = colorCorrect;
+            replyButton[idxCorrectAnswer].image.color = colorCorrect;
 
             // Put in red the wrong answer if applicable
-            if (idx != correctAnswerIdx)
+            if (!reply.success)
             {
                 replyButton[idx].image.color = colorIncorrect;
-                replyButton[correctAnswerIdx].interactable = true;
-                Anim(replyButton[correctAnswerIdx], glow: true);
+                replyButton[idxCorrectAnswer].interactable = true;
+                Anim(replyButton[idxCorrectAnswer], glow: true);
                 userReplied = true;
             }
             else
@@ -164,29 +277,62 @@ public class UIController : MonoBehaviour {
         if (question.t != -1)
         {
             userReplied = false;
-            correctAnswerIdx = question.correctAnswerIdx;
 
-            // Update question
-            questionText.text = question.question;
+            // Update question object
+            qst = question;
+
+            // Update question display
+            questionText.text = qst.question;
             Anim(questionText);
 
 
             // Update progression bar
             Anim(progressionTool);
-            UpdateProgression(question.t, question.tMax);
+            UpdateProgression(qst.t, qst.nIteration);
 
-            // Update reply buttons
-            for (int i = 0; i < replyButton.Count; i++)
+            // Update reply button
+            if (!qst.newQuestion)
             {
-                replyText[i].text = question.possibleReplies[i];
-                replyButton[i].image.color = colorNeutral;
-                replyButton[i].interactable = true;
-                Anim(replyButton[i], glow: false);
+                for (int i = 0; i < replyButton.Count; i++)
+                {
+                    replyText[i].text = qst.possibleReplies[i];
+                    replyButton[i].image.color = colorNeutral;
+                    replyButton[i].interactable = true;
+                    Anim(replyButton[i], glow: false);
+                }
+            } else
+            {
+                // Get idx of correct answer
+                int idxCorrectAnswer =
+                    qst.idPossibleReplies.IndexOf(qst.idCorrectAnswer);
+
+                for (int i = 0; i < replyButton.Count; i++)
+                {
+                    replyText[i].text = qst.possibleReplies[i];
+                    if (i == idxCorrectAnswer)
+                    {
+                        replyButton[i].image.color = colorCorrect;
+                        replyButton[i].interactable = true;
+                        Anim(replyButton[i], glow: true);
+                    } else
+                    {
+                        replyButton[i].image.color = colorNeutral;
+                        replyButton[i].interactable = false;
+                        Anim(replyButton[i], glow: false);
+                    } 
+                }
+
             }
+            
+
+            // Specific if new question
 
             // Prepare sending of the reply to the server
-            reply.userId = question.userId;
-            reply.t = question.t;
+            reply.userId = qst.userId;
+
+            reply.t = qst.t;
+            reply.idQuestion = qst.idQuestion;
+            reply.idPossibleReplies = qst.idPossibleReplies;
             reply.timeDisplay = TimeStamp.Get();
         }
 
@@ -199,9 +345,9 @@ public class UIController : MonoBehaviour {
 
     // ------------ Progress bar ----------- //
 
-    public void UpdateProgression (int value, int maxValue) 
+    public void UpdateProgression(int value, int maxValue)
     {
-      progressionBar.fillAmount = (float) value / maxValue;
+        progressionBar.fillAmount = (float)value / maxValue;
     }
 }
 
